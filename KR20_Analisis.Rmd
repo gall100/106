@@ -1,0 +1,98 @@
+---
+title: "Análisis de Confiabilidad: KR-20 para Cuestionario Dicotómico"
+author: "Tu Nombre"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Teoría KR-20
+
+El coeficiente **KR-20** (Kuder-Richardson Formula 20) se emplea para medir la confiabilidad de cuestionarios o pruebas con respuestas dicotómicas (correcto/incorrecto). Evalúa la consistencia interna, indicando si los ítems son homogéneos y miden el mismo constructo.
+
+**Fórmula:**
+
+$$
+KR-20 = \\frac{k}{k - 1} \\left[1 - \\frac{\\sum p_i q_i}{\\sigma^2}\\right]
+$$
+
+Donde:
+- $k$ es el número de ítems.
+- $p_i$ es la proporción de aciertos por ítem.
+- $q_i$ es la proporción de errores por ítem.
+- $\\sigma^2$ es la varianza de los puntajes totales.
+
+Valores cercanos a 1 indican alta confiabilidad.
+
+---
+
+## Código en R
+
+```{r}
+# Simulación de datos: 8 estudiantes x 27 preguntas
+set.seed(123)
+respuestas <- matrix(sample(0:1, 8 * 27, replace = TRUE), nrow = 8, ncol = 27)
+colnames(respuestas) <- paste0("Q", 1:27)
+rownames(respuestas) <- paste0("Estudiante", 1:8)
+
+# Visualización de las respuestas
+respuestas
+```
+
+---
+
+## Cálculo Manual KR-20
+
+```{r}
+# Número de preguntas
+k <- ncol(respuestas)
+
+# Proporción de aciertos y errores por ítem
+p <- colMeans(respuestas)
+q <- 1 - p
+
+# Suma de p*q
+sum_pq <- sum(p * q)
+
+# Varianza de puntaje total
+puntaje_total <- rowSums(respuestas)
+varianza_total <- var(puntaje_total)
+
+# KR-20 manual
+KR20 <- (k / (k - 1)) * (1 - (sum_pq / varianza_total))
+KR20
+```
+
+---
+
+## Cálculo con el paquete 'psych'
+
+```{r}
+# Instalar y cargar el paquete psych
+if (!requireNamespace("psych", quietly = TRUE)) {
+  install.packages("psych")
+}
+library(psych)
+
+# KR-20 con psych
+kr20_psych <- psych::alpha(respuestas, check.keys = FALSE)$raw_alpha
+kr20_psych
+```
+
+---
+
+## Interpretación
+
+Un coeficiente **KR-20** superior a 0.7 indica buena consistencia interna. Si el valor obtenido es bajo, puede ser necesario revisar o ajustar los ítems del cuestionario.
+
+---
+
+## Resultados
+
+```{r}
+cat("KR-20 manual:", round(KR20, 3), "\n")
+cat("KR-20 (psych):", round(kr20_psych, 3), "\n")
+```
+
+---
+
+**Fin del análisis. Puedes modificar este documento para tus propios datos o presentaciones.**
