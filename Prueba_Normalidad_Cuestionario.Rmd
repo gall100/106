@@ -1,0 +1,100 @@
+---
+title: "Prueba de Normalidad sobre Puntajes de un Cuestionario Dicotómico"
+author: "Virgilio"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Introducción
+
+La verificación de la **normalidad** en los datos es paso esencial previo a la aplicación de pruebas paramétricas en la investigación educativa y psicológica.  
+Para cuestionarios dicotómicos (respuestas "correcta"=1, "incorrecta"=0), se suele evaluar la normalidad sobre el **puntaje total** obtenido por cada estudiante (la suma de respuestas correctas).
+
+---
+
+# Fundamentación Científica
+
+Las pruebas de normalidad permiten comprobar si los puntajes totales siguen una distribución normal. Las más utilizadas son:
+
+- **Shapiro-Wilk:** recomendada para muestras pequeñas y medianas.
+- **Kolmogorov-Smirnov:** adecuada para muestras grandes o parametrizadas.
+
+> La hipótesis nula ($H_0$): *los datos siguen una distribución normal.*
+
+Valores de p > 0.05: **No se rechaza la normalidad** (los datos pueden considerarse normales).
+
+---
+
+# Simulación de datos
+
+Simulamos las respuestas de 25 estudiantes a 27 preguntas:
+
+```{r}
+set.seed(2026)
+respuestas <- matrix(sample(0:1, 25*27, replace=TRUE), nrow=25, ncol=27)
+colnames(respuestas) <- paste0("Q", 1:27)
+rownames(respuestas) <- paste0("Est", 1:25)
+head(respuestas)
+```
+
+---
+
+# Cálculo del puntaje total
+
+El puntaje total es la suma de respuestas correctas por estudiante:
+
+```{r}
+puntajes <- rowSums(respuestas)
+puntajes
+```
+
+---
+
+# Visualización
+
+Histograma y gráfico Q-Q para observar la distribución:
+
+```{r}
+hist(puntajes, breaks=10, main="Histograma de puntajes", xlab="Puntaje total", col="lightblue")
+
+qqnorm(puntajes)
+qqline(puntajes, col="red")
+```
+
+---
+
+# Prueba de normalidad: Shapiro-Wilk
+
+```{r}
+shapiro.test(puntajes)
+```
+
+---
+
+# Prueba de normalidad: Kolmogorov-Smirnov
+
+```{r}
+ks.test(puntajes, "pnorm", mean(puntajes), sd(puntajes))
+```
+
+---
+
+# Interpretación
+
+- Si el valor p de las pruebas es **mayor a 0.05**, se considera que los datos son compatibles con una distribución normal.
+- Si el valor p es **menor a 0.05**, se rechaza la hipótesis de normalidad.
+
+En cuestionarios dicotómicos, los puntajes totales pueden no ser perfectamente normales, especialmente con pocos ítems, pero la comprobación es importante para aplicar tests paramétricos de comparación.
+
+---
+
+# Referencias
+
+- Shapiro, S. S., & Wilk, M. B. (1965). "An analysis of variance test for normality (complete samples)." *Biometrika*, 52(3/4), 591–611.
+- Lilliefors, H. W. (1967). "On the Kolmogorov–Smirnov test for normality with mean and variance unknown." *Journal of the American Statistical Association*, 62(318), 399–402.
+
+---
+
+**Este documento puede personalizarse con tus datos reales sustituyendo el objeto `respuestas`.**
